@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
         }
+
         #map {
             height: 100%;
         }
@@ -19,16 +20,54 @@
 <div id="map"></div>
 <script>
 
+    var mapCenter = {lat: -36.8629404, lng: 174.7250425};
+    var kmlFile = 'http://matveytn.github.io/Google-maps-API-test/busstop.kml';
+
     function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
             zoom: 11,
-            center: {lat: -36.8629404, lng: 174.7250425},
+            center: mapCenter,
         });
 
-        var ctaLayer = new google.maps.KmlLayer({
-            url: 'http://matveytn.github.io/Google-maps-API-test/busstop.kml',
+        var kmlLayer = new google.maps.KmlLayer({
+            url: kmlFile,
             map: map
         });
+    }
+
+    var originA = new google.maps.LatLng(174.77465, -36.89261, 0);
+    var destinationA = new google.maps.LatLng(50.087692, 14.421150);
+
+    var service = new google.maps.DistanceMatrixService();
+
+    service.getDistanceMatrix(
+            {
+                origins: [originA],
+                destinations: [destinationA],
+                travelMode: 'DRIVING',
+                transitOptions: TransitOptions,
+                drivingOptions: DrivingOptions,
+                unitSystem: UnitSystem,
+                avoidHighways: Boolean,
+                avoidTolls: Boolean,
+            }, callback);
+
+    function callback(response, status) {
+        if (status == 'OK') {
+            var origins = response.originAddresses;
+            var destinations = response.destinationAddresses;
+
+            for (var i = 0; i<origins.length; i++) {
+                var results = response.rows[i].elements;
+                for (var j = 0; j<results.length; j++) {
+                    var element = results[j];
+                    var distance = element.distance.text;
+                    var duration = element.duration.text;
+                    var from = origins[i];
+                    var to = destinations[j];
+                }
+            }
+        }
     }
 </script>
 <script async defer
